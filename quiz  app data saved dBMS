@@ -1,0 +1,88 @@
+import sqlite3
+
+# Create a connection to the database
+conn = sqlite3.connect('quiz_database.db')
+cursor = conn.cursor()
+
+# Create tables
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS questions (
+        id INTEGER PRIMARY KEY,
+        question TEXT,
+        answer1 TEXT,
+        answer2 TEXT,
+        answer3 TEXT,
+        correct_answer INTEGER
+    )
+''')
+
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS user_answers (
+        id INTEGER PRIMARY KEY,
+        question_id INTEGER,
+        user_answer INTEGER,
+        FOREIGN KEY (question_id) REFERENCES questions (id)
+    )
+''')
+
+# Insert quiz data into the database
+quiz_data = [
+    {
+        "question": "What is Python?",
+        "answers": ["Language", "Framework", "Library"],
+        "correct": 0
+    },
+    {
+        "question": "Who created Python?",
+        "answers": ["Guido van Rossum", "Bjarne Stroustrup", "Linus Torvalds"],
+        "correct": 0
+    },
+    {
+        "question": "What is the extension for Python files?",
+        "answers": [".py", ".java", ".cpp"],
+        "correct": 0
+    }
+]
+
+for data in quiz_data:
+    cursor.execute('''
+        INSERT INTO questions (question, answer1, answer2, answer3, correct_answer)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (data['question'], data['answers'][0], data['answers'][1], data['answers'][2], data['correct']))
+
+conn.commit()
+
+# Quiz app function
+def quiz_app():
+    score = 0
+    cursor.execute('SELECT * FROM questions')
+    questions = cursor.fetchall()
+    
+    for question in questions:
+        print(f"\nQuestion: {question[1]}")
+        print(f"1. {question[2]}")
+        print(f"2. {question[3]}")
+        print(f"3. {question[4]}")
+        
+        user_answer = int(input("Enter the correct answer number: ")) - 1
+        cursor.execute('''
+            INSERT INTO user_answers (question_id, user_answer)
+            VALUES (?, ?)
+        ''', (question[0], user_answer))
+        
+        conn.commit()
+        
+        if user_answer == question[5]:
+            score += 1
+            print("Correct!")
+        else:
+            print(f"Wrong! The correct answer is {question[2 + question[5]]}")
+    
+    print(f"\nQuiz finished! Your score is {score}/{len(questions)}")
+
+# Run quiz app
+quiz_app()
+
+# Close the connection
+conn.close()
+

@@ -1,0 +1,54 @@
+# Quiz data stored in a dictionary
+quiz_data = {
+    "questions": [
+        {
+            "question": "What is Python?",
+            "answers": ["Language", "Framework", "Library"],
+            "correct": "Language"
+        },
+        {
+            "question": "Who created Python?",
+            "answers": ["Guido van Rossum", "Bjarne Stroustrup", "Linus Torvalds"],
+            "correct": "Guido van Rossum"
+        },
+        {
+            "question": "What is the extension for Python files?",
+"answers": [".py", ".java", ".cpp"],
+            "correct": ".py"
+        }
+    ]
+}
+
+# User answers stored in a list
+user_answers = []
+
+# Quiz app function
+def quiz_app():
+    score = 0
+    global user_answers
+    user_answers = []
+    
+    for i, question in enumerate(quiz_data["questions"]):
+        print(f"\nQuestion {i+1}: {question['question']}")
+        for j, answer in enumerate(question['answers']):
+            print(f"{j+1}. {answer}")
+        
+        user_answer = int(input("Enter the correct answer number: ")) - 1
+        user_answers.append(user_answer)
+        
+        if user_answer == question['correct']:
+            score += 1
+            print("Correct!")
+        else:
+            print(f"Wrong! The correct answer is {question['answers']
+                  [question['correct']]}")
+    
+    print(f"\nQuiz finished! Your score is {score}/{len(quiz_data['questions'])}")
+    
+    # Display user answers
+    print("\nUser Answers:")
+    for i, answer in enumerate(user_answers):
+        print(f"Question {i+1}: {quiz_data['questions'][i]['answers'][answer]}")
+
+# Run quiz app
+quiz_app()
